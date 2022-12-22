@@ -14,6 +14,7 @@ extern int MaxTakeProfit=0;
 extern int MaxStopLoss=0;
 extern bool ReverseMode = false;
 
+int AccountIndexes[];
 int AccountNumbers[];
 double AccountLotCoefficients[];
 
@@ -47,6 +48,7 @@ int OnInit()
       if(accountsCount > 0)
       {
          ArrayResize(AccountNumbers, accountsCount);
+         ArrayResize(AccountIndexes, accountsCount);
          ArrayResize(AccountLotCoefficients, accountsCount);
          
          for(int i=0; i < accountsCount; i++)
@@ -54,6 +56,7 @@ int OnInit()
             string accountSettingsResults[];
             int accountsSettingsCount = StringSplit(accountResults[i], uAccountSettingsSeparator, accountSettingsResults);
             
+            AccountIndexes[i] = i;
             AccountNumbers[i] = StrToInteger(accountSettingsResults[0]);
             if(accountsSettingsCount > 1)
             {
@@ -107,7 +110,7 @@ void OnTick()
 //---      
       if(ArraySize(AccountNumbers)==0)
       {
-         Alert("Looking into the clouds.");
+         Alert("No accounts configured...");
       }
       ShowCommentsOnChart();
   }
@@ -182,7 +185,7 @@ void OpenOrders()
                   }
                }
                
-               string copierOrderComment=GetCopierOrderComment(AccountNumbers[i],orderTicket,orderType, openPrice);
+               string copierOrderComment=GetCopierOrderComment(i,orderTicket,orderType, openPrice);
                
                if(!CheckPositionOpened(copierOrderComment))
                {
@@ -234,10 +237,10 @@ void OpenOrders()
 int GetOrderType(string orderTypeStr){
    int orderType = -1;
    
-   if(orderTypeStr == "BUY"){
+   if(orderTypeStr == "B"){
       orderType = OP_BUY;
    }
-   else if(orderTypeStr == "SELL"){
+   else if(orderTypeStr == "S"){
       orderType = OP_SELL;
    }
    
@@ -248,10 +251,10 @@ string GetOrderTypeName(int orderType){
    string orderTypeName = "";
    
    if(orderType == OP_BUY){
-      orderTypeName = "BUY";
+      orderTypeName = "B";
    }
    else if(orderType == OP_SELL){
-      orderTypeName = "SELL";
+      orderTypeName = "S";
    }
    
    return orderTypeName;
@@ -273,7 +276,7 @@ void CloseOrders()
         string orderComment=OrderComment();
         string result[];
         int k=StringSplit(orderComment,uSep,result);
-        int account=StrToInteger(result[0]);
+        int account=AccountNumbers[StrToInteger(result[0])];
         int ticket=StrToInteger(result[1]);
         int orderType=GetOrderType(result[2]);
         double openPrice=StrToDouble(result[3]);
@@ -341,10 +344,10 @@ void CloseOrders()
    }
 }
 
-string GetCopierOrderComment(int accountNumber,int orderTicket, int orderType, double openPrice)
+string GetCopierOrderComment(int accountIndex,int orderTicket, int orderType, double openPrice)
 {
    string orderComment=
-      StringConcatenate(IntegerToString(accountNumber)
+      StringConcatenate(IntegerToString(accountIndex)
       ,"_",IntegerToString(orderTicket)
       ,"_",GetOrderTypeName(orderType)
       ,"_",DoubleToStr(openPrice,5));
