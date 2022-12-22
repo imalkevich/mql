@@ -171,10 +171,10 @@ string GetOrderFileName(int accountNumber, string orderSymbol, int orderType, do
 int GetOrderType(string orderTypeStr){
    int orderType = -1;
    
-   if(orderTypeStr == "BUY"){
+   if(orderTypeStr == "B"){
       orderType = OP_BUY;
    }
-   else if(orderTypeStr == "SELL"){
+   else if(orderTypeStr == "S"){
       orderType = OP_SELL;
    }
    
@@ -185,10 +185,10 @@ string GetOrderTypeName(int orderType){
    string orderTypeName = "";
    
    if(orderType == OP_BUY){
-      orderTypeName = "BUY";
+      orderTypeName = "B";
    }
    else if(orderType == OP_SELL){
-      orderTypeName = "SELL";
+      orderTypeName = "S";
    }
    
    return orderTypeName;
